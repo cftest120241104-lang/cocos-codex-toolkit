@@ -1,47 +1,60 @@
 # Cocos Codex Toolkit
 
-Reusable toolkit for Cocos Creator 2.x projects.
+面向 Cocos Creator 2.x 项目的可复用工具仓库。
 
-This repository separates:
+这个仓库把能力拆成四层：
 
-- `bin/` command-line entrypoints
-- `toolkit/` executable logic
-- `skills/` installable global Codex skills
-- `scripts/` machine setup helpers
+- `bin/`：命令行入口
+- `toolkit/`：实际执行逻辑
+- `skills/`：可安装到全局的 Codex skill
+- `scripts/`：安装和机器初始化脚本
 
-## Install on Windows
+## Windows 安装
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1
 ```
 
-The install script:
+安装脚本会做三件事：
 
-- copies the skills in `skills/` into `%USERPROFILE%\.codex\skills`
-- sets the user environment variable `COCOS_CODEX_TOOLKIT_HOME`
-- adds `bin\` to the user `PATH` when missing
+- 把 `skills/` 下的 skill 同步到 `%USERPROFILE%\.codex\skills`
+- 设置用户环境变量 `COCOS_CODEX_TOOLKIT_HOME`
+- 在用户 `PATH` 中补上 `bin\`
 
-After opening a new shell, you can run:
+安装完成后，重新打开一个终端，就可以直接使用：
 
 ```powershell
 cocos-toolkit qa --project "E:\path\to\project"
 ```
 
-## Commands
+## 编码说明
 
-### Discover one running Creator instance
+这个仓库默认使用 `UTF-8` 保存文件。  
+`README.md` 和 `SKILL.md` 可以写中文，但在部分中文 Windows 环境里，某些 Python 脚本会默认按系统 `gbk` 去读取文本文件。
+
+如果你要在本机校验 skill，优先使用仓库自带的验证脚本：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\validate-skills.ps1
+```
+
+这个脚本会自动以 `PYTHONUTF8=1` 方式调用校验器，避免中文 skill 因编码被误判失败。
+
+## 命令
+
+### 发现一个正在运行的 Creator 实例
 
 ```powershell
 cocos-toolkit discover --project "E:\path\to\project"
 ```
 
-### Run engine QA
+### 运行引擎验收
 
 ```powershell
 cocos-toolkit qa --project "E:\path\to\project"
 ```
 
-With explicit replay scope:
+指定验收重放范围：
 
 ```powershell
 cocos-toolkit qa `
@@ -50,13 +63,13 @@ cocos-toolkit qa `
   --prefab "db://assets/AB/game/enemy/Monster1001.prefab"
 ```
 
-The QA command writes:
+验收会固定产出：
 
 - `raw-<timestamp>.jsonl`
 - `summary-<timestamp>.json`
 - `report-<timestamp>.md`
 
-### Call one cocos-mcp tool directly
+### 直接调用一个 cocos-mcp 工具
 
 ```powershell
 cocos-toolkit mcp-call `
@@ -65,9 +78,9 @@ cocos-toolkit mcp-call `
   --args-json '{"depth":2}'
 ```
 
-### Common editor builder commands
+## 常用内容制作命令
 
-Open a scene:
+打开场景：
 
 ```powershell
 cocos-toolkit scene-open `
@@ -75,7 +88,7 @@ cocos-toolkit scene-open `
   --scene "db://assets/lobby/main.fire"
 ```
 
-Open a prefab:
+打开预制件：
 
 ```powershell
 cocos-toolkit prefab-open `
@@ -83,7 +96,7 @@ cocos-toolkit prefab-open `
   --prefab "db://assets/prefabs/Test.prefab"
 ```
 
-Instantiate a prefab into the current scene:
+把预制件实例化到当前场景：
 
 ```powershell
 cocos-toolkit prefab-instantiate `
@@ -92,7 +105,7 @@ cocos-toolkit prefab-instantiate `
   --parent-id "parent-uuid"
 ```
 
-Create a prefab from a scene node:
+把场景节点保存成预制件：
 
 ```powershell
 cocos-toolkit prefab-create `
@@ -101,7 +114,7 @@ cocos-toolkit prefab-create `
   --prefab-name "RewardPopup"
 ```
 
-Read scene hierarchy:
+读取场景层级：
 
 ```powershell
 cocos-toolkit scene-hierarchy `
@@ -110,7 +123,7 @@ cocos-toolkit scene-hierarchy `
   --details
 ```
 
-Read node components:
+读取节点组件：
 
 ```powershell
 cocos-toolkit components-get `
@@ -118,7 +131,7 @@ cocos-toolkit components-get `
   --node-id "node-uuid"
 ```
 
-Create a node:
+创建节点：
 
 ```powershell
 cocos-toolkit node-create `
@@ -128,7 +141,7 @@ cocos-toolkit node-create `
   --parent-id "parent-uuid"
 ```
 
-Add or update a component:
+添加、更新、删除组件：
 
 ```powershell
 cocos-toolkit component-add `
@@ -148,7 +161,7 @@ cocos-toolkit component-remove `
   --component-id "component-id"
 ```
 
-Rename a node:
+重命名节点：
 
 ```powershell
 cocos-toolkit node-rename `
@@ -157,13 +170,13 @@ cocos-toolkit node-rename `
   --name "NewNodeName"
 ```
 
-Save the scene:
+保存场景：
 
 ```powershell
 cocos-toolkit scene-save --project "E:\path\to\project"
 ```
 
-Find references:
+查找引用：
 
 ```powershell
 cocos-toolkit references-find `
@@ -172,7 +185,7 @@ cocos-toolkit references-find `
   --target-type asset
 ```
 
-Read console output:
+读取控制台：
 
 ```powershell
 cocos-toolkit console-read `
@@ -181,11 +194,11 @@ cocos-toolkit console-read `
   --limit 20
 ```
 
-## Codex usage
+## 在 Codex 里的使用方式
 
-After installation, Codex can use the installed global skills:
+安装后，Codex 可以直接使用这两个全局 skill：
 
 - `cocos-engine-qa`
 - `cocos-editor-builder`
 
-Those installed skills prefer this repository as the execution layer through `COCOS_CODEX_TOOLKIT_HOME`.
+这两个已安装的 skill 会优先通过 `COCOS_CODEX_TOOLKIT_HOME` 回调这个仓库作为执行层。

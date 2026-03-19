@@ -1,14 +1,14 @@
 ---
 name: cocos-editor-builder
-description: "Build or modify Cocos Creator 2.x scene and prefab content through cocos-mcp. Use when the user wants Codex to operate the Creator editor itself: open scenes, inspect hierarchy, create nodes, attach or update components, instantiate or save prefabs, or edit scene content in a running Cocos project."
+description: "通过 cocos-mcp 构建或修改 Cocos Creator 2.x 的场景与预制件内容。适用于用户希望 Codex 直接操作 Creator 编辑器本身的情况，例如打开场景、查看层级、创建节点、挂载或更新组件、实例化或保存预制件，以及修改运行中的 Cocos 项目内容。"
 ---
 
-# Cocos Editor Builder
+# Cocos 编辑器搭建
 
-Use this skill for editor-side content creation and modification. Do not use it as a final acceptance gate.
+这个 skill 用于编辑器侧的内容创建和修改，不负责最终验收。
 
-This skill is intended to be installed from the shared `cocos-codex-toolkit` repository so the same editing workflow can be reused across machines and projects.
-Prefer the toolkit CLI for repeatable editor actions when possible:
+这个 skill 设计为从共享的 `cocos-codex-toolkit` 仓库安装，这样跨机器、跨项目时都能复用同一套编辑器工作流。
+如果是可重复执行的编辑器动作，优先使用 toolkit CLI：
 `cocos-toolkit scene-open`
 `cocos-toolkit prefab-open`
 `cocos-toolkit prefab-instantiate`
@@ -24,19 +24,19 @@ Prefer the toolkit CLI for repeatable editor actions when possible:
 `cocos-toolkit console-read`
 `cocos-toolkit scene-save`
 
-## Workflow
+## 工作流
 
-1. Bind the correct project instance.
-   Use `cocos-cc-manager` when the target project is not already selected or when multiple Creator windows are open.
-   Confirm the selected project before changing anything.
+1. 绑定正确的项目实例。
+   当目标项目尚未选中，或者存在多个 Creator 窗口时，先使用 `cocos-cc-manager`。
+   在任何修改前，先确认当前项目就是目标项目。
 
-2. Inspect before writing.
-   Before node edits, call `get_scene_hierarchy`.
-   Before component edits, call `manage_components` with `action: "get"`.
-   Before prefab work, open the prefab or inspect the target parent first.
+2. 写入前先检查。
+   改节点前，先调用 `get_scene_hierarchy`。
+   改组件前，先调用 `manage_components` 且 `action: "get"`。
+   做预制件相关操作前，先打开预制件或先确认目标父节点。
 
-3. Modify through cocos-mcp tools, not by guessing JSON.
-   Prefer:
+3. 通过 cocos-mcp 工具修改，不要靠猜 JSON 结构。
+   优先使用：
    `open_scene`
    `open_prefab`
    `create_node`
@@ -46,37 +46,37 @@ Prefer the toolkit CLI for repeatable editor actions when possible:
    `create_prefab`
    `save_scene`
 
-4. Follow strict safety rules.
-   Never update a node or component that you have not just confirmed exists.
-   Never guess property names on components.
-   Always assign asset references by UUID, not by path-like strings.
-   Keep scene edits and script edits separate; use file editing only for source files.
+4. 遵守严格的安全规则。
+   不要修改一个你刚才没有确认存在的节点或组件。
+   不要猜测组件属性名。
+   资源引用一律使用 UUID，不要用伪路径字符串。
+   场景编辑和脚本编辑分开处理；文件编辑只用于源码文件。
 
-5. Save and verify.
-   Save the scene or prefab after meaningful edits.
-   Re-read hierarchy or component state to confirm the editor accepted the change.
-   If the user asks for confidence that the project still runs cleanly, hand off to `cocos-engine-qa`.
+5. 保存并验证。
+   做完有意义的改动后保存场景或预制件。
+   再次读取层级或组件状态，确认编辑器真的接受了修改。
+   如果用户要求确认项目仍然能干净运行，交给 `cocos-engine-qa`。
 
-## Task Patterns
+## 常见任务模式
 
-Scene layout work:
-open the scene
-inspect the target parent
-create or move nodes
-update transforms
-save
+场景布局：
+打开场景
+检查目标父节点
+创建或移动节点
+更新变换
+保存
 
-Component wiring:
-inspect the node
-inspect existing components
-add or update the component
-verify referenced assets use UUIDs
+组件挂接：
+检查节点
+检查现有组件
+添加或更新组件
+确认资源引用使用的是 UUID
 
-Prefab work:
-open the prefab or instantiate into a scene
-modify nodes and components
-save prefab or create a new prefab
+预制件操作：
+打开预制件，或者先实例化到场景
+修改节点和组件
+保存预制件，或创建新的预制件
 
-## References
+## 参考
 
-Read `references/safe-editing.md` for the concise checklist and common pitfalls before performing larger editor changes.
+在进行较大的编辑器修改前，先阅读 `references/safe-editing.md`，里面有简洁的检查清单和常见陷阱。

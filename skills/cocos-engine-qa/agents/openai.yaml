@@ -1,4 +1,4 @@
 interface:
-  display_name: "Cocos Engine QA"
-  short_description: "Acceptance gate for Cocos projects via CDP logs"
-  default_prompt: "Use $cocos-engine-qa as the final acceptance gate for this Cocos Creator project: bind the correct editor instance, replay scenes or prefabs, collect raw engine logs via CDP, and return PASS or FAIL."
+  display_name: "Cocos 引擎验收"
+  short_description: "通过 CDP 原始日志做 Cocos 项目最终验收"
+  default_prompt: "使用 $cocos-engine-qa 作为这个 Cocos Creator 项目的最终验收闸门：绑定正确的编辑器实例，重放场景或预制件，通过 CDP 抓取原始引擎日志，并返回 PASS 或 FAIL。"

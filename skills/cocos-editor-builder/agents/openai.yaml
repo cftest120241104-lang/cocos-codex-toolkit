@@ -1,4 +1,4 @@
 interface:
-  display_name: "Cocos Editor Builder"
-  short_description: "Build and edit Cocos content through cocos-mcp"
-  default_prompt: "Use $cocos-editor-builder to open the correct Cocos Creator project, inspect scene state safely, and create or modify nodes, components, prefabs, or scene content through cocos-mcp."
+  display_name: "Cocos 编辑器搭建"
+  short_description: "通过 cocos-mcp 构建和修改 Cocos 内容"
+  default_prompt: "使用 $cocos-editor-builder 打开正确的 Cocos Creator 项目，安全检查场景状态，并通过 cocos-mcp 创建或修改节点、组件、预制件或其他场景内容。"
