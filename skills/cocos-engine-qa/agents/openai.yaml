@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cocos Engine QA"
+  short_description: "Acceptance gate for Cocos projects via CDP logs"
+  default_prompt: "Use $cocos-engine-qa as the final acceptance gate for this Cocos Creator project: bind the correct editor instance, replay scenes or prefabs, collect raw engine logs via CDP, and return PASS or FAIL."
