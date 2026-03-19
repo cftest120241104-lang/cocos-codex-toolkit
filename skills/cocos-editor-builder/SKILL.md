@@ -11,11 +11,17 @@ This skill is intended to be installed from the shared `cocos-codex-toolkit` rep
 Prefer the toolkit CLI for repeatable editor actions when possible:
 `cocos-toolkit scene-open`
 `cocos-toolkit prefab-open`
+`cocos-toolkit prefab-instantiate`
+`cocos-toolkit prefab-create`
 `cocos-toolkit scene-hierarchy`
 `cocos-toolkit components-get`
 `cocos-toolkit node-create`
 `cocos-toolkit component-add`
 `cocos-toolkit component-update`
+`cocos-toolkit component-remove`
+`cocos-toolkit node-rename`
+`cocos-toolkit references-find`
+`cocos-toolkit console-read`
 `cocos-toolkit scene-save`
 
 ## Workflow

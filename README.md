@@ -83,6 +83,24 @@ cocos-toolkit prefab-open `
   --prefab "db://assets/prefabs/Test.prefab"
 ```
 
+Instantiate a prefab into the current scene:
+
+```powershell
+cocos-toolkit prefab-instantiate `
+  --project "E:\path\to\project" `
+  --prefab "db://assets/prefabs/Test.prefab" `
+  --parent-id "parent-uuid"
+```
+
+Create a prefab from a scene node:
+
+```powershell
+cocos-toolkit prefab-create `
+  --project "E:\path\to\project" `
+  --node-id "node-uuid" `
+  --prefab-name "RewardPopup"
+```
+
 Read scene hierarchy:
 
 ```powershell
@@ -123,12 +141,44 @@ cocos-toolkit component-update `
   --node-id "node-uuid" `
   --component-id "component-id" `
   --properties-json '{"top":16,"right":16}'
+
+cocos-toolkit component-remove `
+  --project "E:\path\to\project" `
+  --node-id "node-uuid" `
+  --component-id "component-id"
+```
+
+Rename a node:
+
+```powershell
+cocos-toolkit node-rename `
+  --project "E:\path\to\project" `
+  --id "node-uuid" `
+  --name "NewNodeName"
 ```
 
 Save the scene:
 
 ```powershell
 cocos-toolkit scene-save --project "E:\path\to\project"
+```
+
+Find references:
+
+```powershell
+cocos-toolkit references-find `
+  --project "E:\path\to\project" `
+  --target-id "uuid" `
+  --target-type asset
+```
+
+Read console output:
+
+```powershell
+cocos-toolkit console-read `
+  --project "E:\path\to\project" `
+  --type error `
+  --limit 20
 ```
 
 ## Codex usage
