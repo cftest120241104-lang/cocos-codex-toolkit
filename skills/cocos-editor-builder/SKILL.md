@@ -8,6 +8,15 @@ description: "Build or modify Cocos Creator 2.x scene and prefab content through
 Use this skill for editor-side content creation and modification. Do not use it as a final acceptance gate.
 
 This skill is intended to be installed from the shared `cocos-codex-toolkit` repository so the same editing workflow can be reused across machines and projects.
+Prefer the toolkit CLI for repeatable editor actions when possible:
+`cocos-toolkit scene-open`
+`cocos-toolkit prefab-open`
+`cocos-toolkit scene-hierarchy`
+`cocos-toolkit components-get`
+`cocos-toolkit node-create`
+`cocos-toolkit component-add`
+`cocos-toolkit component-update`
+`cocos-toolkit scene-save`
 
 ## Workflow
 
