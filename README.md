@@ -42,6 +42,20 @@ powershell -ExecutionPolicy Bypass -File .\scripts\validate-skills.ps1
 
 ## 命令
 
+### 做一次环境体检
+
+不带项目路径时，检查本机 toolkit、PATH、Python、已安装 skill、Creator 进程数量：
+
+```powershell
+cocos-toolkit doctor
+```
+
+带项目路径时，还会继续检查该项目是否能被发现、对应的 MCP 和 CDP 是否可达：
+
+```powershell
+cocos-toolkit doctor --project "E:\path\to\project"
+```
+
 ### 发现一个正在运行的 Creator 实例
 
 ```powershell

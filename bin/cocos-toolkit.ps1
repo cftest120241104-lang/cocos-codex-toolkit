@@ -10,6 +10,7 @@ $OutputEncoding = [System.Text.UTF8Encoding]::new($false)
 function Show-Usage {
   @'
 Usage:
+  cocos-toolkit doctor [--project <path>] [--active-projects-path <path>]
   cocos-toolkit qa --project <path> [--scene <db-url>]... [--prefab <db-url>]... [--output-dir <path>] [--wait-seconds <n>] [--no-smoke]
   cocos-toolkit discover --project <path> [--active-projects-path <path>]
   cocos-toolkit mcp-call --project <path> --tool <tool-name> [--args-json <json>] [--active-projects-path <path>]
@@ -135,7 +136,142 @@ function Invoke-ToolkitMcp {
   & $scriptPath @params
 }
 
+function Test-CommandExists {
+  param([string]$Name)
+
+  return $null -ne (Get-Command $Name -ErrorAction SilentlyContinue)
+}
+
+function Test-PathInUserEnvPath {
+  param([string]$PathToFind)
+
+  $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+  if (-not $userPath) {
+    return $false
+  }
+
+  $normalized = $PathToFind.TrimEnd('\').ToLowerInvariant()
+  foreach ($entry in ($userPath.Split(';') | Where-Object { $_ })) {
+    if ($entry.TrimEnd('\').ToLowerInvariant() -eq $normalized) {
+      return $true
+    }
+  }
+  return $false
+}
+
+function Invoke-SafeWebRequest {
+  param(
+    [string]$Uri,
+    [string]$Method = "Get",
+    [string]$ContentType,
+    [string]$Body
+  )
+
+  try {
+    if ($Method -eq "Post") {
+      return Invoke-WebRequest -Uri $Uri -Method Post -ContentType $ContentType -Body $Body -UseBasicParsing
+    }
+    return Invoke-WebRequest -Uri $Uri -Method Get -UseBasicParsing
+  } catch {
+    return $null
+  }
+}
+
 switch ($command) {
+  "doctor" {
+    $project = $null
+    $activeProjectsPath = $null
+
+    for ($i = 0; $i -lt $remaining.Count; $i++) {
+      switch ($remaining[$i]) {
+        "--project" {
+          $i++
+          $project = $remaining[$i]
+        }
+        "--active-projects-path" {
+          $i++
+          $activeProjectsPath = $remaining[$i]
+        }
+        default {
+          throw "Unknown option for doctor: $($remaining[$i])"
+        }
+      }
+    }
+
+    $codexHome = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $env:USERPROFILE ".codex" }
+    $userBinPath = Join-Path $repoRoot "bin"
+    $creatorProcesses = @(Get-CimInstance Win32_Process -Filter "name = 'CocosCreator.exe'" -ErrorAction SilentlyContinue)
+    $skillsRoot = Join-Path $codexHome "skills"
+    $engineSkillPath = Join-Path $skillsRoot "cocos-engine-qa"
+    $builderSkillPath = Join-Path $skillsRoot "cocos-editor-builder"
+    $toolkitHomeEnv = [Environment]::GetEnvironmentVariable("COCOS_CODEX_TOOLKIT_HOME", "User")
+
+    $checks = [ordered]@{
+      toolkitRepoExists = Test-Path -LiteralPath $repoRoot
+      toolkitHomeEnvSet = -not [string]::IsNullOrWhiteSpace($toolkitHomeEnv)
+      toolkitHomeEnvMatchesRepo = ($toolkitHomeEnv -and ((Resolve-Path -LiteralPath $toolkitHomeEnv -ErrorAction SilentlyContinue).Path -eq (Resolve-Path -LiteralPath $repoRoot).Path))
+      binInUserPath = Test-PathInUserEnvPath -PathToFind $userBinPath
+      powershellAvailable = Test-CommandExists -Name "powershell"
+      pythonAvailable = Test-CommandExists -Name "python"
+      installedSkillEngineQa = Test-Path -LiteralPath $engineSkillPath
+      installedSkillEditorBuilder = Test-Path -LiteralPath $builderSkillPath
+      cocosCreatorProcessCount = $creatorProcesses.Count
+    }
+
+    $doctor = [ordered]@{
+      repoRoot = $repoRoot
+      codexHome = $codexHome
+      toolkitHomeEnv = $toolkitHomeEnv
+      binPath = $userBinPath
+      checks = $checks
+      project = $null
+    }
+
+    if ($project) {
+      $projectInfo = [ordered]@{
+        projectPath = $project
+        projectExists = Test-Path -LiteralPath $project
+        discoverable = $false
+        instance = $null
+        mcpReachable = $false
+        cdpReachable = $false
+      }
+
+      if ($projectInfo.projectExists) {
+        try {
+          $discoverParams = @{ ProjectPath = $project }
+          if ($activeProjectsPath) {
+            $discoverParams.ActiveProjectsPath = $activeProjectsPath
+          }
+          $discoverScript = Join-Path $repoRoot "toolkit\qa\discover_cocos_instance.ps1"
+          $instance = & $discoverScript @discoverParams | ConvertFrom-Json
+          $projectInfo.discoverable = $true
+          $projectInfo.instance = $instance
+
+          if ($instance.cdpPort) {
+            $cdpResponse = Invoke-SafeWebRequest -Uri "http://127.0.0.1:$($instance.cdpPort)/json/version"
+            $projectInfo.cdpReachable = $null -ne $cdpResponse
+          }
+
+          if ($instance.mcpPort) {
+            $body = @{
+              name = "read_console"
+              arguments = @{ limit = 1 }
+            } | ConvertTo-Json -Depth 10
+            $mcpResponse = Invoke-SafeWebRequest -Uri "http://127.0.0.1:$($instance.mcpPort)/call-tool" -Method Post -ContentType "application/json" -Body $body
+            $projectInfo.mcpReachable = $null -ne $mcpResponse
+          }
+        } catch {
+          $projectInfo.error = $_.Exception.Message
+        }
+      }
+
+      $doctor.project = $projectInfo
+    }
+
+    $doctor | ConvertTo-Json -Depth 20
+    break
+  }
   "qa" {
     $project = $null
     $outputDir = $null
