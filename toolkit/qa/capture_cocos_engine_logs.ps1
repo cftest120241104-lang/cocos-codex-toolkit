@@ -229,9 +229,23 @@ if (-not $OutputDir) {
 
 New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
 $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
-$rawPath = Join-Path $OutputDir "raw-$stamp.jsonl"
-$summaryPath = Join-Path $OutputDir "summary-$stamp.json"
-$reportPath = Join-Path $OutputDir "report-$stamp.md"
+$existingIndexes = @(
+  Get-ChildItem -Path $OutputDir -File -ErrorAction SilentlyContinue |
+    ForEach-Object {
+      $m = [regex]::Match($_.Name, '^log(\d+)-')
+      if ($m.Success) { [int]$m.Groups[1].Value }
+    } |
+    Where-Object { $_ -is [int] }
+)
+$nextIndex = if ($existingIndexes.Count -gt 0) {
+  (($existingIndexes | Measure-Object -Maximum).Maximum + 1)
+} else {
+  1
+}
+$logPrefix = "log$nextIndex"
+$rawPath = Join-Path $OutputDir "$logPrefix-raw-$stamp.jsonl"
+$summaryPath = Join-Path $OutputDir "$logPrefix-summary-$stamp.json"
+$reportPath = Join-Path $OutputDir "$logPrefix-report-$stamp.md"
 
 $cdpList = Invoke-RestMethod -Uri "http://127.0.0.1:$($instance.cdpPort)/json/list"
 $page = $cdpList | Where-Object { $_.type -eq "page" } | Select-Object -First 1
