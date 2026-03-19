@@ -10,26 +10,61 @@ $OutputEncoding = [System.Text.UTF8Encoding]::new($false)
 function Show-Usage {
   @'
 Usage:
-  cocos-toolkit doctor [--project <path>] [--active-projects-path <path>]
-  cocos-toolkit qa --project <path> [--scene <db-url>]... [--prefab <db-url>]... [--output-dir <path>] [--wait-seconds <n>] [--no-smoke]
-  cocos-toolkit discover --project <path> [--active-projects-path <path>]
-  cocos-toolkit mcp-call --project <path> --tool <tool-name> [--args-json <json>] [--active-projects-path <path>]
-  cocos-toolkit scene-open --project <path> --scene <db-url>
-  cocos-toolkit prefab-open --project <path> --prefab <db-url>
-  cocos-toolkit prefab-instantiate --project <path> --prefab <db-url> [--parent-id <uuid>]
-  cocos-toolkit prefab-create --project <path> --node-id <uuid> --prefab-name <name>
-  cocos-toolkit scene-save --project <path>
-  cocos-toolkit scene-hierarchy --project <path> [--depth <n>] [--details] [--node-id <uuid>]
-  cocos-toolkit components-get --project <path> --node-id <uuid>
-  cocos-toolkit component-add --project <path> --node-id <uuid> --component-type <type> [--properties-json <json>]
-  cocos-toolkit component-update --project <path> --node-id <uuid> --component-id <id> [--component-type <type>] [--properties-json <json>]
-  cocos-toolkit component-remove --project <path> --node-id <uuid> --component-id <id>
-  cocos-toolkit node-create --project <path> --name <name> [--type <empty|sprite|button|label>] [--parent-id <uuid>]
-  cocos-toolkit node-rename --project <path> --id <uuid> --name <new-name>
-  cocos-toolkit node-transform --project <path> --id <uuid> [--x <n>] [--y <n>] [--width <n>] [--height <n>] [--scale-x <n>] [--scale-y <n>] [--rotation <n>] [--opacity <n>] [--color <#RRGGBB>]
-  cocos-toolkit references-find --project <path> --target-id <uuid> [--target-type <auto|node|asset>]
-  cocos-toolkit console-read --project <path> [--limit <n>] [--type <info|warn|error|success|mcp>]
-  cocos-toolkit install
+  cocos-toolkit <command> [options]
+
+Environment:
+  doctor               Check toolkit, PATH, Python, installed skills, and optional project MCP/CDP reachability
+    cocos-toolkit doctor [--project <path>] [--active-projects-path <path>]
+
+QA:
+  qa                   Run engine acceptance with real scene/prefab replay and CDP raw logs
+    cocos-toolkit qa --project <path> [--scene <db-url>]... [--prefab <db-url>]... [--output-dir <path>] [--wait-seconds <n>] [--no-smoke]
+  discover             Find the Creator process plus MCP/CDP ports for one project
+    cocos-toolkit discover --project <path> [--active-projects-path <path>]
+
+Generic MCP:
+  mcp-call             Call one cocos-mcp tool directly for debugging or unsupported actions
+    cocos-toolkit mcp-call --project <path> --tool <tool-name> [--args-json <json>] [--active-projects-path <path>]
+
+Scene / Prefab:
+  scene-open           Open a scene
+    cocos-toolkit scene-open --project <path> --scene <db-url>
+  prefab-open          Open a prefab
+    cocos-toolkit prefab-open --project <path> --prefab <db-url>
+  prefab-instantiate   Instantiate a prefab into the current scene
+    cocos-toolkit prefab-instantiate --project <path> --prefab <db-url> [--parent-id <uuid>]
+  prefab-create        Save a scene node as a prefab
+    cocos-toolkit prefab-create --project <path> --node-id <uuid> --prefab-name <name>
+  scene-save           Save the current scene
+    cocos-toolkit scene-save --project <path>
+
+Inspect:
+  scene-hierarchy      Read scene hierarchy with optional depth, details, and root node
+    cocos-toolkit scene-hierarchy --project <path> [--depth <n>] [--details] [--node-id <uuid>]
+  components-get       Read the component list on one node
+    cocos-toolkit components-get --project <path> --node-id <uuid>
+  references-find      Find references to one node or asset
+    cocos-toolkit references-find --project <path> --target-id <uuid> [--target-type <auto|node|asset>]
+  console-read         Read cocos-mcp console output
+    cocos-toolkit console-read --project <path> [--limit <n>] [--type <info|warn|error|success|mcp>]
+
+Edit:
+  node-create          Create a node
+    cocos-toolkit node-create --project <path> --name <name> [--type <empty|sprite|button|label>] [--parent-id <uuid>]
+  node-rename          Rename a node
+    cocos-toolkit node-rename --project <path> --id <uuid> --name <new-name>
+  node-transform       Update node position, size, scale, rotation, opacity, or color
+    cocos-toolkit node-transform --project <path> --id <uuid> [--x <n>] [--y <n>] [--width <n>] [--height <n>] [--scale-x <n>] [--scale-y <n>] [--rotation <n>] [--opacity <n>] [--color <#RRGGBB>]
+  component-add        Add a component with optional properties JSON
+    cocos-toolkit component-add --project <path> --node-id <uuid> --component-type <type> [--properties-json <json>]
+  component-update     Update component properties
+    cocos-toolkit component-update --project <path> --node-id <uuid> --component-id <id> [--component-type <type>] [--properties-json <json>]
+  component-remove     Remove a component
+    cocos-toolkit component-remove --project <path> --node-id <uuid> --component-id <id>
+
+Setup:
+  install              Install global skills and write toolkit env vars plus PATH
+    cocos-toolkit install
 '@
 }
 
